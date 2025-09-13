@@ -6,8 +6,8 @@
     <title>IRL Pro Widget</title>
     <style>
         body {
-            background-color: transparent;
-            color: rgba(0, 255, 0);
+            background-color: transparent; /* O fundo da página é transparente */
+            color: white; /* Cor do texto padrão (para se destacar no widget) */
         }
         #irl-widget {
             position: absolute;
@@ -18,7 +18,7 @@
             justify-content: flex-start;
             align-items: flex-start;
             font-size: 24px;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(60, 60, 60, 0.7); /* Fundo do widget cinza semi-transparente */
             padding: 10px;
             border-radius: 8px;
         }
@@ -26,6 +26,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 5px;
+            color: white; /* Garante que o texto dentro do widget seja branco */
         }
         .emoji {
             margin-right: 10px;
@@ -39,11 +40,9 @@
     </div>
 
     <script>
-        // Adicione sua chave de API e a cidade desejada
         const apiKey = 'fcd84f2a0697a105570e69f985923fc4'; 
         const city = 'São Paulo';
 
-        // Função para formatar a data (dia/mês/ano)
         function formatDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -51,7 +50,6 @@
             return `${day}/${month}/${year}`;
         }
 
-        // Função principal para atualizar o widget
         async function updateWidget() {
             const now = new Date();
             const time = now.toLocaleTimeString('pt-BR', { hour12: false });
@@ -61,7 +59,6 @@
             
             let widgetContent = '';
 
-            // --- Requisição para a API de temperatura ---
             try {
                 const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=pt_br`);
                 const data = await response.json();
@@ -69,22 +66,18 @@
                 if (data.main && data.weather) {
                     const temperature = Math.round(data.main.temp);
                     const weatherEmoji = getWeatherEmoji(data.weather[0].icon);
-
                     widgetContent += `<div class="widget-item"><span class="emoji">${weatherEmoji}</span> ${temperature}°C</div>`;
                 }
             } catch (error) {
                 console.error('Erro ao buscar a temperatura:', error);
             }
             
-            // Adiciona a data e hora à variável, com os emojis de relógio e calendário
             widgetContent += `<div class="widget-item"><span class="emoji">📅</span> <span>${date}</span></div>`;
             widgetContent += `<div class="widget-item"><span class="emoji">⏰</span> <span>${time}</span></div>`;
 
-            // Finalmente, renderiza todo o conteúdo de uma vez
             widget.innerHTML = widgetContent;
         }
 
-        // Mapeia os ícones da API para emojis (inclui a carinha)
         function getWeatherEmoji(iconCode) {
             const emojis = {
                 '01d': '😊☀️', '01n': '😊🌙',
@@ -100,15 +93,8 @@
             return emojis[iconCode] || '❓';
         }
 
-        // Atualiza o widget a cada segundo para manter a hora precisa
         setInterval(updateWidget, 1000);
-
-        // Chamada inicial para que o widget apareça imediatamente
         updateWidget();
     </script>
-
 </body>
 </html>
-
-
-
