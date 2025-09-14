@@ -48,7 +48,7 @@
         .date-text {
             font-size: 16px;
             color: #ccc;
-            margin-top: -5px; /* aproxima da hora */
+            margin-top: 8px; /* mais espaçamento da hora */
         }
     </style>
 </head>
@@ -115,7 +115,7 @@
 
             // --- Hora ---
             widgetContent += `<div class="widget-item"><span class="emoji">⏰</span> ${time}</div>`;
-            // --- Data (sem emoji, menor) ---
+            // --- Data (sem emoji, menor e mais abaixo) ---
             widgetContent += `<div class="date-text">${date}</div>`;
 
             widget.innerHTML = widgetContent;
