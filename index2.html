@@ -22,18 +22,15 @@
             padding: 10px;
             border-radius: 8px;
         }
-        /* Velocidade (direita) */
+        /* Velocidade (direita) - agora mesmo estilo */
         #speed-widget {
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 40px;
-            font-weight: bold;
+            font-size: 24px; /* mesmo tamanho */
             background-color: rgba(60, 60, 60, 0.7); /* Fundo cinza semi-transparente */
-            padding: 10px 20px;
+            padding: 10px;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
         }
         .widget-item {
             display: flex;
@@ -48,7 +45,7 @@
         .date-text {
             font-size: 16px;
             color: #ccc;
-            margin-top: 8px; /* mais espaçamento da hora */
+            margin-top: 8px; /* mais afastada da hora */
         }
     </style>
 </head>
@@ -58,7 +55,9 @@
     <div id="irl-widget"></div>
 
     <!-- Velocidade separada -->
-    <div id="speed-widget">🚗 0 km/h</div>
+    <div id="speed-widget">
+        <div class="widget-item"><span class="emoji">🚗</span><span id="speed-value">0 km/h</span></div>
+    </div>
 
     <script>
         const apiKey = 'fcd84f2a0697a105570e69f985923fc4'; 
@@ -120,8 +119,8 @@
 
             widget.innerHTML = widgetContent;
 
-            // --- Velocidade separada ---
-            document.getElementById('speed-widget').innerHTML = `🚗 ${currentSpeed} km/h`;
+            // --- Velocidade separada (igual estilo) ---
+            document.getElementById('speed-value').textContent = `${currentSpeed} km/h`;
         }
 
         // Emojis clima
@@ -146,4 +145,3 @@
 
 </body>
 </html>
-
