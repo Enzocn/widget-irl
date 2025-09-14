@@ -16,7 +16,6 @@
             left: 10px;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
             align-items: flex-start;
             font-size: 24px;
             background-color: rgba(0, 0, 0, 0.4);
@@ -44,6 +43,12 @@
         .emoji {
             margin-right: 10px;
             font-size: 30px;
+        }
+        /* Estilo da data menor */
+        .date-text {
+            font-size: 16px;
+            color: #ccc;
+            margin-top: -5px; /* aproxima da hora */
         }
     </style>
 </head>
@@ -108,9 +113,10 @@
                 console.error('Erro ao buscar a temperatura:', error);
             }
 
-            // --- Data e hora ---
-            widgetContent += `<div class="widget-item"><span class="emoji">📅</span> ${date}</div>`;
+            // --- Hora ---
             widgetContent += `<div class="widget-item"><span class="emoji">⏰</span> ${time}</div>`;
+            // --- Data (sem emoji, menor) ---
+            widgetContent += `<div class="date-text">${date}</div>`;
 
             widget.innerHTML = widgetContent;
 
