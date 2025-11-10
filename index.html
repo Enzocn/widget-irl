@@ -6,8 +6,8 @@
     <title>IRL Pro Widget</title>
     <style>
         body {
-            background-color: transparent; /* O fundo da página é transparente */
-            color: white; /* **AQUI:** A cor do texto padrão deve ser branca */
+            background-color: transparent; /* Fundo transparente */
+            color: white; /* Cor padrão do texto */
         }
         #irl-widget {
             position: absolute;
@@ -18,7 +18,7 @@
             justify-content: flex-start;
             align-items: flex-start;
             font-size: 24px;
-            background-color: rgba(60, 60, 60, 0.7); /* Fundo do widget cinza semi-transparente */
+            background-color: rgba(60, 60, 60, 0.7); /* Fundo cinza semi-transparente */
             padding: 10px;
             border-radius: 8px;
         }
@@ -26,7 +26,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 5px;
-            color: white; /* **AQUI:** Garante que o texto dentro do widget seja branco */
+            color: white; /* Garante texto branco */
         }
         .emoji {
             margin-right: 10px;
@@ -36,8 +36,7 @@
 </head>
 <body>
 
-    <div id="irl-widget">
-    </div>
+    <div id="irl-widget"></div>
 
     <script>
         const apiKey = 'fcd84f2a0697a105570e69f985923fc4'; 
@@ -56,7 +55,6 @@
             const date = formatDate(now);
             
             const widget = document.getElementById('irl-widget');
-            
             let widgetContent = '';
 
             try {
@@ -72,7 +70,8 @@
                 console.error('Erro ao buscar a temperatura:', error);
             }
             
-            widgetContent += `<div class="widget-item"><span class="emoji">📅</span> <span>${date}</span></div>`;
+            /* Aqui foi feita a troca do emoji 📅 por 🗓️ */
+            widgetContent += `<div class="widget-item"><span class="emoji">🗓️</span> <span>${date}</span></div>`;
             widgetContent += `<div class="widget-item"><span class="emoji">⏰</span> <span>${time}</span></div>`;
 
             widget.innerHTML = widgetContent;
