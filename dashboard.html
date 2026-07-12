@@ -2,22 +2,21 @@
 <html lang="pt-BR">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
+    <title>CN Live Suite</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
 
-<title>CN Live Suite</title>
+    <!-- Fonte -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="https://unpkg.com/lucide-static/font/lucide.css">
-
-<link rel="stylesheet" href="css/style.css">
+    <!-- Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
 </head>
 
@@ -25,243 +24,289 @@
 
 <div class="app">
 
-<aside class="sidebar">
+    <!-- SIDEBAR -->
 
-<div class="logo">
+    <aside class="sidebar">
 
-<h1>CN Live Suite</h1>
+        <div class="logo">
 
-<span>v1.0</span>
+            <h1>CN Live Suite</h1>
+
+            <span>v1.0</span>
+
+        </div>
+
+        <div class="menu">
+
+            <div class="menu-title">GERAL</div>
+
+            <button class="item active">
+
+                <i data-lucide="layout-dashboard"></i>
+
+                Dashboard
+
+            </button>
+
+            <div class="menu-title">
+
+                WIDGETS
+
+            </div>
+
+            <button class="item">
+
+                <i data-lucide="image"></i>
+
+                Logo
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="message-circle"></i>
+
+                Chat
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="qr-code"></i>
+
+                LivePix
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="cloud-sun"></i>
+
+                Clima
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="bell-ring"></i>
+
+                Alertas
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="monitor-play"></i>
+
+                Plataforma
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="map-pinned"></i>
+
+                GPS
+
+            </button>
+
+            <div class="menu-title">
+
+                SISTEMA
+
+            </div>
+
+            <button class="item">
+
+                <i data-lucide="palette"></i>
+
+                Aparência
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="folder-open"></i>
+
+                Presets
+
+            </button>
+
+            <button class="item">
+
+                <i data-lucide="settings"></i>
+
+                Configurações
+
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- CONTEÚDO -->
+
+    <main>
+
+        <!-- TOPO -->
+
+        <header>
+
+            <div>
+
+                <h2>
+
+                    Dashboard
+
+                </h2>
+
+                <span>
+
+                    Bem-vindo ao CN Live Suite
+
+                </span>
+
+            </div>
+
+            <div class="top-buttons">
+
+                <button>
+
+                    Salvar
+
+                </button>
+
+                <button>
+
+                    Atualizar
+
+                </button>
+
+            </div>
+
+        </header>
+
+        <!-- CORPO -->
+
+        <section class="content">
+
+            <div class="left">
+
+                <div class="card">
+
+                    <h3>Status</h3>
+
+                    <div class="status">
+
+                        <span class="green"></span>
+
+                        Overlay Online
+
+                    </div>
+
+                    <div class="status">
+
+                        <span class="red"></span>
+
+                        WebSocket Offline
+
+                    </div>
+
+                    <div class="status">
+
+                        <span class="red"></span>
+
+                        Twitch Offline
+
+                    </div>
+
+                    <div class="status">
+
+                        <span class="red"></span>
+
+                        Kick Offline
+
+                    </div>
+
+                    <div class="status">
+
+                        <span class="red"></span>
+
+                        YouTube Offline
+
+                    </div>
+
+                </div>
+
+                <div class="card">
+
+                    <h3>Performance</h3>
+
+                    <p>CPU: 0%</p>
+
+                    <p>RAM: 0 MB</p>
+
+                    <p>FPS: 60</p>
+
+                </div>
+
+            </div>
+
+            <div class="right">
+
+                <div class="preview">
+
+                    <div class="preview-header">
+
+                        Preview do Overlay
+
+                    </div>
+
+                    <div class="preview-screen">
+
+                        <div class="preview-logo">
+
+                            SUA LOGO
+
+                        </div>
+
+                        <div class="preview-chat">
+
+                            CHAT
+
+                        </div>
+
+                        <div class="preview-weather">
+
+                            CLIMA
+
+                        </div>
+
+                        <div class="preview-livepix">
+
+                            LIVEPIX
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<nav>
+<script>
 
-<div class="menu-title">
+lucide.createIcons();
 
-GERAL
+</script>
 
-</div>
-
-<button class="menu active" data-page="dashboard">
-
-<i class="icon icon-layout-dashboard"></i>
-
-Dashboard
-
-</button>
-
-<div class="menu-title">
-
-WIDGETS
-
-</div>
-
-<button class="menu" data-page="logo">
-
-<i class="icon icon-image"></i>
-
-Logo
-
-</button>
-
-<button class="menu" data-page="chat">
-
-<i class="icon icon-message-circle"></i>
-
-Chat
-
-</button>
-
-<button class="menu" data-page="livepix">
-
-<i class="icon icon-smartphone"></i>
-
-LivePix
-
-</button>
-
-<button class="menu" data-page="weather">
-
-<i class="icon icon-cloud-sun"></i>
-
-Clima
-
-</button>
-
-<button class="menu" data-page="alerts">
-
-<i class="icon icon-bell-ring"></i>
-
-Alertas
-
-</button>
-
-<button class="menu" data-page="platform">
-
-<i class="icon icon-monitor-play"></i>
-
-Plataforma
-
-</button>
-
-<button class="menu" data-page="gps">
-
-<i class="icon icon-map-pinned"></i>
-
-GPS
-
-</button>
-
-<div class="menu-title">
-
-SISTEMA
-
-</div>
-
-<button class="menu" data-page="appearance">
-
-<i class="icon icon-palette"></i>
-
-Aparência
-
-</button>
-
-<button class="menu" data-page="presets">
-
-<i class="icon icon-folder-open"></i>
-
-Presets
-
-</button>
-
-<button class="menu" data-page="settings">
-
-<i class="icon icon-settings"></i>
-
-Configurações
-
-</button>
-
-</nav>
-
-</aside>
-
-<main>
-
-<header>
-
-<div>
-
-<h2 id="title">
-
-Dashboard
-
-</h2>
-
-<p>
-
-Controle completo do seu overlay.
-
-</p>
-
-</div>
-
-<div class="buttons">
-
-<button>
-
-Salvar
-
-</button>
-
-<button>
-
-Atualizar
-
-</button>
-
-</div>
-
-</header>
-
-<section id="content">
-
-<div class="cards">
-
-<div class="card">
-
-<h3>Overlay</h3>
-
-<span class="online">
-
-🟢 Online
-
-</span>
-
-</div>
-
-<div class="card">
-
-<h3>WebSocket</h3>
-
-<span class="offline">
-
-🔴 Offline
-
-</span>
-
-</div>
-
-<div class="card">
-
-<h3>Servidor</h3>
-
-<span class="offline">
-
-🔴 Offline
-
-</span>
-
-</div>
-
-<div class="card">
-
-<h3>Versão</h3>
-
-<span>
-
-1.0.0
-
-</span>
-
-</div>
-
-</div>
-
-<div class="preview">
-
-<h3>
-
-Preview
-
-</h3>
-
-<div class="screen">
-
-Overlay aparecerá aqui
-
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-</div>
-
-<script src="js/app.js"></script>
+<script src="app.js"></script>
 
 </body>
 
