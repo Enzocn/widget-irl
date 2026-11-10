@@ -1,431 +1,189 @@
-mkdir -p ~/overlay-hub/public && cat > ~/overlay-hub/public/overlay.html << 'OVERLAYEOF'
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Overlay - enzocn_</title>
-<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overlay Live - Clima e Hora</title>
 <style>
-  html, body {
-    margin: 0;
-    background: transparent;
-    color: #fff;
+  :root {
+    --accent: #ff2638;
+    --panel: rgba(10, 10, 14, .86);
+    --text: #fff;
+    --muted: #b8bac4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; width: 100vw; height: 100vh; overflow: hidden;
+    background: transparent; color: var(--text);
     font-family: Arial, Helvetica, sans-serif;
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
   }
-
-  /* ---------- Colunas laterais (logo, clima, contador) ---------- */
-  .stack {
-    position: fixed;
-    top: 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    z-index: 10;
+  .overlay {
+    position: absolute; top: 28px; left: 28px;
+    display: flex; align-items: center; gap: 0;
+    min-width: 440px; padding: 13px 18px;
+    background: var(--panel); border: 1px solid rgba(255,255,255,.12);
+    border-left: 4px solid var(--accent); border-radius: 13px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.28);
+    backdrop-filter: blur(9px);
   }
-  .stack.left  { left: 40px; align-items: flex-start; }
-  .stack.right { right: 40px; align-items: flex-end; }
-
-  /* ---------- Logo ---------- */
-  #logo-wrap { display: none; }
-  #logo-wrap.show { display: block; }
-  #logo-img {
-    max-width: 220px;
-    display: block;
-    animation: pulse 2.2s ease-in-out infinite;
-    transform-origin: center;
+  .block { padding: 0 17px; }
+  .block:first-child { padding-left: 5px; }
+  .block + .block { border-left: 1px solid rgba(255,255,255,.16); }
+  .label {
+    color: var(--muted); font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;
   }
-  @keyframes pulse {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.06); }
-    100% { transform: scale(1); }
+  .value { font-size: 25px; line-height: 1; font-weight: 800; white-space: nowrap; }
+  #clock { font-variant-numeric: tabular-nums; }
+  #city { font-size: 18px; max-width: 175px; overflow: hidden; text-overflow: ellipsis; }
+  .weather-line { display: flex; align-items: center; gap: 7px; }
+  #weatherIcon { font-size: 25px; }
+  #temperature { font-size: 25px; }
+  #condition { color: var(--muted); font-size: 10px; margin-top: 5px; white-space: nowrap; }
+  #status { position: absolute; top: 100%; left: 7px; margin-top: 5px; font-size: 10px; color: #d0d0d0; }
+  .gear {
+    position: absolute; top: 17px; right: 17px; width: 38px; height: 38px;
+    border: 1px solid rgba(255,255,255,.2); border-radius: 10px;
+    color: white; background: rgba(10,10,14,.72); font-size: 19px; cursor: pointer;
   }
-
-  /* ---------- Widget clima/data/hora ---------- */
-  #irl-widget {
-    display: none;
-    flex-direction: column;
-    font-size: 22px;
-    background-color: rgba(60, 60, 60, 0.7);
-    padding: 10px 14px;
-    border-radius: 8px;
+  .settings {
+    display: none; position: absolute; top: 64px; right: 17px; width: 300px;
+    padding: 18px; border-radius: 14px; background: rgba(13,13,18,.96);
+    border: 1px solid rgba(255,255,255,.15); box-shadow: 0 12px 35px rgba(0,0,0,.4);
   }
-  #irl-widget.show { display: flex; }
-  .widget-item { display: flex; align-items: center; margin-bottom: 5px; line-height: 1; }
-  .widget-item:last-child { margin-bottom: 0; }
-  .icon { display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; width: 28px; height: 28px; color: #fff; }
-  .icon svg { width: 100%; height: 100%; }
-  .small-text { font-size: 19px; }
-
-  /* ---------- Contador de plataforma(s) ao vivo ---------- */
-  #viewer-badge {
-    display: none;
-    flex-direction: column;
-    gap: 8px;
+  .settings.open { display: block; }
+  .settings h2 { margin: 0 0 6px; font-size: 17px; }
+  .settings p { margin: 0 0 14px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+  input {
+    width: 100%; padding: 11px 12px; border-radius: 8px;
+    border: 1px solid #454550; outline: none; color: white;
+    background: #202027; font-size: 14px;
   }
-  #viewer-badge.show { display: flex; }
-  .badge-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 18px;
-    color: #fff;
+  input:focus { border-color: var(--accent); }
+  .save {
+    width: 100%; margin-top: 10px; padding: 11px; border: 0;
+    border-radius: 8px; background: var(--accent); color: white;
+    font-weight: 700; cursor: pointer;
   }
-  .badge-pill .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: #fff;
-    animation: blink 1.4s ease-in-out infinite;
+  .hint { margin-top: 10px; color: #999; font-size: 10px; line-height: 1.4; }
+  @media (max-width: 500px) {
+    .overlay { transform: scale(.82); transform-origin: top left; }
   }
-  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
-  .badge-twitch  { background: rgba(100, 65, 165, 0.85); }
-  .badge-kick    { background: rgba(83, 252, 24, 0.85); color:#062b00; }
-  .badge-youtube { background: rgba(255, 0, 0, 0.85); }
-
-  /* ---------- QR code (imagem fixa) ---------- */
-  #qrcode-wrap {
-    display: none;
-    background: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  }
-  #qrcode-wrap.show { display: block; }
-  #qrcode-img { display: block; width: 160px; height: 160px; }
-
-  /* ---------- GPS: caixinha de mapa no canto inferior (esquerda ou direita) ---------- */
-  #gps-wrap {
-    position: fixed;
-    bottom: 40px;
-    width: 360px;
-    height: 240px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 0 14px rgba(0,0,0,0.55);
-    border: 2px solid rgba(255,255,255,0.25);
-    z-index: 10;
-    display: none;
-  }
-  #gps-wrap.show { display: block; }
-  #gps-wrap.left  { left: 40px; }
-  #gps-wrap.right { right: 40px; }
-  #gps-map { width: 100%; height: 100%; }
-  .device-wrap { display: flex; flex-direction: column; align-items: center; }
-  .device-dot {
-    width: 14px; height: 14px; border-radius: 50%;
-    border: 2px solid white; box-shadow: 0 0 6px rgba(0,0,0,0.7);
-  }
-  .device-label {
-    margin-top: 2px;
-    background: rgba(0,0,0,0.65); color: #fff; padding: 1px 6px; border-radius: 4px;
-    font: 600 10px/1.3 sans-serif; white-space: nowrap;
-  }
-  .maplibregl-ctrl-attrib, .maplibregl-ctrl-logo { display: none !important; }
 </style>
 </head>
 <body>
+  <div class="overlay">
+    <div class="block">
+      <div class="label">Hora local</div>
+      <div class="value" id="clock">--:--:--</div>
+    </div>
+    <div class="block">
+      <div class="label">Temperatura</div>
+      <div class="weather-line"><span id="weatherIcon">☁️</span><span class="value" id="temperature">--°</span></div>
+      <div id="condition">Carregando clima...</div>
+    </div>
+    <div class="block">
+      <div class="label">Localização</div>
+      <div class="value" id="city">Defina a cidade</div>
+    </div>
+    <div id="status"></div>
+  </div>
 
-  <div class="stack left"  id="stack-left"></div>
-  <div class="stack right" id="stack-right"></div>
-
-  <!-- Templates dos widgets de coluna (movidos via JS para left/right) -->
-  <div id="logo-wrap"><img id="logo-img" src="/logo.png" alt="logo" /></div>
-
-  <div id="irl-widget"></div>
-
-  <div id="qrcode-wrap"><img id="qrcode-img" src="/qrcode.png" alt="QR code" /></div>
-
-  <div id="viewer-badge"></div>
-
-  <!-- GPS -->
-  <div id="gps-wrap"><div id="gps-map"></div></div>
+  <button class="gear" id="gear" title="Configurar cidade">⚙</button>
+  <section class="settings" id="settings">
+    <h2>Configurar overlay</h2>
+    <p>Digite a cidade e o estado (ou país). O clima e o fuso horário serão encontrados automaticamente.</p>
+    <input id="cityInput" type="text" placeholder="Ex.: Campinas, São Paulo">
+    <button class="save" id="save">Salvar cidade</button>
+    <div class="hint">A cidade fica salva neste navegador. Para usar no OBS, adicione este arquivo como Fonte de navegador ou marque “Arquivo local”.</div>
+  </section>
 
 <script>
-  // Cenas do OBS em que o GPS pode aparecer. Ajuste aqui se os nomes das
-  // cenas mudarem (ex: se voce renomear "LOW" pra outra coisa no futuro).
-  const GPS_ALLOWED_SCENES = ['LIVE', 'LOW'];
+(() => {
+  const $ = id => document.getElementById(id);
+  let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  // ---------- Weather/data/hora (buscado via nosso servidor, sem chave exposta no navegador) ----------
-  let lastWeatherFetch = 0;
-  let cachedWeatherHtml = '';
+  function updateClock() {
+    $('clock').textContent = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: timezone, hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false
+    }).format(new Date());
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
 
-  function formatDate(date) {
-    const d = String(date.getDate()).padStart(2, '0');
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const y = date.getFullYear();
-    return `${d}/${m}/${y}`;
+  function weatherDescription(code) {
+    if (code === 0) return ['☀️', 'Céu limpo'];
+    if ([1,2].includes(code)) return ['🌤️', 'Parcialmente nublado'];
+    if (code === 3) return ['☁️', 'Nublado'];
+    if ([45,48].includes(code)) return ['🌫️', 'Neblina'];
+    if ([51,53,55,56,57].includes(code)) return ['🌦️', 'Garoa'];
+    if ([61,63,65,66,67,80,81,82].includes(code)) return ['🌧️', 'Chuva'];
+    if ([71,73,75,77,85,86].includes(code)) return ['❄️', 'Neve'];
+    if ([95,96,99].includes(code)) return ['⛈️', 'Tempestade'];
+    return ['🌡️', 'Condição atual'];
   }
-  function calendarSVG() {
-    return `<span class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.5"></rect><path d="M16 3v4M8 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="1"></line></svg></span>`;
-  }
-  function clockSVG() {
-    return `<span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"></circle><path d="M12 7v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>`;
-  }
-  function weatherEmoji(code) {
-    const map = { '01d':'☀️','01n':'🌙','02d':'🌤️','02n':'☁️','03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️','09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌧️','11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️','50d':'🌫️','50n':'🌫️' };
-    return map[code] || '❓';
-  }
-  async function getWeatherHtml(show) {
-    if (!show) return '';
-    const now = Date.now();
-    if (now - lastWeatherFetch < 5 * 60 * 1000 && cachedWeatherHtml) return cachedWeatherHtml;
+
+  async function loadCity(city) {
+    $('status').textContent = 'Buscando cidade e clima...';
     try {
-      const resp = await fetch('/api/weather', { cache: 'no-store' });
-      const data = await resp.json();
-      if (data && !data.error) {
-        cachedWeatherHtml = `<div class="widget-item"><span class="icon">${weatherEmoji(data.icon)}</span><span class="small-text">${data.temp}°C</span></div>`;
-        lastWeatherFetch = now;
-      }
-    } catch (e) { console.error('erro clima', e); }
-    return cachedWeatherHtml;
-  }
-  async function renderWeatherWidget(cfg) {
-    const el = document.getElementById('irl-widget');
-    let html = '';
-    html += await getWeatherHtml(cfg.showWeather);
-    if (cfg.showDate) html += `<div class="widget-item">${calendarSVG()}<span class="small-text">${formatDate(new Date())}</span></div>`;
-    if (cfg.showTime) html += `<div class="widget-item">${clockSVG()}<span class="small-text">${new Date().toLocaleTimeString('pt-BR', { hour12: false })}</span></div>`;
-    el.innerHTML = html;
-  }
+      const geoUrl = 'https://geocoding-api.open-meteo.com/v1/search?name=' +
+        encodeURIComponent(city) + '&count=1&language=pt&format=json';
+      const geoResponse = await fetch(geoUrl);
+      if (!geoResponse.ok) throw new Error('Falha na busca da cidade');
+      const geo = await geoResponse.json();
+      if (!geo.results || !geo.results.length) throw new Error('Cidade não encontrada');
+      const place = geo.results[0];
+      const displayCity = [place.name, place.admin1].filter(Boolean)
+        .filter((v, i, a) => a.indexOf(v) === i).join(', ');
+      $('city').textContent = displayCity;
+      timezone = place.timezone || 'America/Sao_Paulo';
+      updateClock();
 
-  // ---------- Contador: um pill por plataforma ativa no momento ----------
-  function renderViewerBadge(cfg, live) {
-    const el = document.getElementById('viewer-badge');
-    const platforms = (live && live.platforms) || [];
-    if (!cfg.visible || !platforms.length) {
-      el.classList.remove('show');
-      el.innerHTML = '';
-      return;
-    }
-    el.classList.add('show');
-    const names = { twitch: 'TWITCH', kick: 'KICK', youtube: 'YOUTUBE' };
-    el.innerHTML = platforms
-      .map((p) => `<div class="badge-pill badge-${p}"><span class="dot"></span><span>${names[p] || p.toUpperCase()}</span></div>`)
-      .join('');
-  }
-
-  // ---------- QR code (imagem fixa, com ciclo opcional 10s on / 1min off) ----------
-  let qrCycleTimer = null;
-  let qrCycleActive = false;
-
-  function stopQrCycle() {
-    if (qrCycleTimer) clearTimeout(qrCycleTimer);
-    qrCycleTimer = null;
-    qrCycleActive = false;
-  }
-
-  function startQrCycle() {
-    if (qrCycleActive) return;
-    qrCycleActive = true;
-    const el = document.getElementById('qrcode-wrap');
-    function showThenHide() {
-      el.classList.add('show');
-      qrCycleTimer = setTimeout(() => {
-        el.classList.remove('show');
-        qrCycleTimer = setTimeout(showThenHide, 60000);
-      }, 10000);
-    }
-    showThenHide();
-  }
-
-  function applyQrState(cfg) {
-    placeInStack('qrcode-wrap', cfg.side);
-    const el = document.getElementById('qrcode-wrap');
-    if (!cfg.visible) {
-      stopQrCycle();
-      el.classList.remove('show');
-      return;
-    }
-    if (cfg.cycle) {
-      startQrCycle();
-    } else {
-      stopQrCycle();
-      el.classList.add('show');
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code&timezone=auto`;
+      const weatherResponse = await fetch(weatherUrl);
+      if (!weatherResponse.ok) throw new Error('Falha ao carregar clima');
+      const weather = await weatherResponse.json();
+      const current = weather.current;
+      const [icon, description] = weatherDescription(current.weather_code);
+      $('weatherIcon').textContent = icon;
+      $('temperature').textContent = `${Math.round(current.temperature_2m)}°C`;
+      $('condition').textContent = description;
+      $('status').textContent = '';
+      localStorage.setItem('overlayCity', city);
+    } catch (error) {
+      $('status').textContent = error.message || 'Não foi possível carregar os dados';
+      $('condition').textContent = 'Verifique a cidade ou a conexão';
     }
   }
 
-  // ---------- Monta as colunas esquerda/direita respeitando side de cada widget ----------
-  function placeInStack(elId, side) {
-    const target = document.getElementById('stack-' + side);
-    const el = document.getElementById(elId);
-    if (target && el.parentElement !== target) target.appendChild(el);
-  }
-
-  // =====================================================================
-  // GPS: mapa no canto inferior, 1 ou mais celulares, rota opcional
-  // =====================================================================
-  let gpsMap = null, gpsMarkers = {}, gpsTrailData = {}, gpsInited = false, gpsWsConnected = false;
-
-  function emptyFC() { return { type: 'FeatureCollection', features: [] }; }
-
-  async function initGpsMap() {
-    if (gpsInited) return;
-    gpsInited = true;
-    const cfg = await (await fetch('/api/gps/config')).json();
-    if (!cfg.maptilerKey) { console.error('GPS: MAPTILER_KEY nao configurada'); return; }
-
-    gpsMap = new maplibregl.Map({
-      container: 'gps-map',
-      style: `https://api.maptiler.com/maps/satellite/style.json?key=${cfg.maptilerKey}`,
-      center: [-46.63, -23.55],
-      zoom: 15,
-      attributionControl: false,
-      interactive: false
-    });
-
-    gpsMap.on('load', async () => {
-      gpsMap.addSource('gps-route', { type: 'geojson', data: emptyFC() });
-      gpsMap.addLayer({
-        id: 'gps-route-line', type: 'line', source: 'gps-route',
-        paint: { 'line-color': '#ffffff', 'line-width': 3, 'line-dasharray': [2, 2] }
-      });
-
-      const state = await (await fetch('/api/gps/state')).json();
-      Object.entries(state.devices).forEach(([id, d]) => {
-        gpsTrailData[id] = (d.trail || []).slice();
-        updateGpsDevice(id, d.point, d.color, d.label);
-      });
-      if (state.route) setGpsRoute(state.route);
-
-      fitGpsView();
-      connectGpsWs();
-    });
-  }
-
-  function fitGpsView() {
-    const pts = Object.values(gpsTrailData).flat();
-    if (!pts.length) return;
-    if (pts.length === 1) {
-      gpsMap.setCenter([pts[0].lon, pts[0].lat]);
-      return;
+  $('gear').addEventListener('click', () => $('settings').classList.toggle('open'));
+  $('save').addEventListener('click', () => {
+    const city = $('cityInput').value.trim();
+    if (city) {
+      loadCity(city);
+      $('settings').classList.remove('open');
     }
-    const lons = pts.map(p => p.lon), lats = pts.map(p => p.lat);
-    gpsMap.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], { padding: 30, maxZoom: 17, duration: 0 });
+  });
+  $('cityInput').addEventListener('keydown', event => {
+    if (event.key === 'Enter') $('save').click();
+  });
+
+  const savedCity = localStorage.getItem('overlayCity');
+  if (savedCity) {
+    $('cityInput').value = savedCity;
+    loadCity(savedCity);
+  } else {
+    $('settings').classList.add('open');
+    $('status').textContent = 'Abra as configurações e escolha sua cidade';
   }
 
-  function connectGpsWs() {
-    if (gpsWsConnected) return;
-    gpsWsConnected = true;
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    const ws = new WebSocket(`${proto}://${location.host}/ws`);
-    ws.onmessage = (ev) => {
-      const msg = JSON.parse(ev.data);
-      if (msg.type === 'gps-position') {
-        if (!gpsTrailData[msg.device_id]) gpsTrailData[msg.device_id] = [];
-        gpsTrailData[msg.device_id].push(msg.point);
-        if (gpsTrailData[msg.device_id].length > 300) gpsTrailData[msg.device_id].shift();
-        updateGpsDevice(msg.device_id, msg.point, msg.color, msg.label);
-      } else if (msg.type === 'gps-route') {
-        setGpsRoute(msg.route);
-      } else if (msg.type === 'gps-device' && gpsMarkers[msg.device_id]) {
-        gpsMarkers[msg.device_id].labelEl.textContent = msg.label;
-      }
-    };
-    ws.onclose = () => { gpsWsConnected = false; setTimeout(connectGpsWs, 2000); };
-  }
-
-  function updateGpsDevice(id, point, color, label) {
-    if (!point || !gpsMap) return;
-
-    if (!gpsMarkers[id]) {
-      const wrap = document.createElement('div');
-      wrap.className = 'device-wrap';
-      const dot = document.createElement('div');
-      dot.className = 'device-dot';
-      dot.style.background = color || '#ff4d4d';
-      const labelEl = document.createElement('div');
-      labelEl.className = 'device-label';
-      labelEl.textContent = label || id;
-      wrap.appendChild(dot);
-      wrap.appendChild(labelEl);
-      const marker = new maplibregl.Marker({ element: wrap }).setLngLat([point.lon, point.lat]).addTo(gpsMap);
-      gpsMarkers[id] = marker;
-      gpsMarkers[id].labelEl = labelEl;
-    } else {
-      gpsMarkers[id].setLngLat([point.lon, point.lat]);
-    }
-
-    const trailId = `gps-trail-${id}`;
-    const pts = gpsTrailData[id] && gpsTrailData[id].length ? gpsTrailData[id] : [point];
-    const geojson = { type: 'Feature', geometry: { type: 'LineString', coordinates: pts.map((p) => [p.lon, p.lat]) } };
-    if (!gpsMap.getSource(trailId)) {
-      gpsMap.addSource(trailId, { type: 'geojson', data: geojson });
-      gpsMap.addLayer({ id: trailId, type: 'line', source: trailId, paint: { 'line-color': color || '#ff4d4d', 'line-width': 2, 'line-opacity': 0.85 } }, 'gps-route-line');
-    } else {
-      gpsMap.getSource(trailId).setData(geojson);
-    }
-  }
-
-  function setGpsRoute(route) {
-    if (!gpsMap || !gpsMap.getSource('gps-route')) return;
-    gpsMap.getSource('gps-route').setData(route ? route.geojson : emptyFC());
-  }
-
-  // GPS so aparece se: o widget estiver ligado no painel E a cena atual do
-  // OBS for LIVE ou LOW E tiver pelo menos 1 celular mandando posicao.
-  function applyGpsState(cfg, currentScene, activeDevices) {
-    const wrap = document.getElementById('gps-wrap');
-    const allowedByScene = GPS_ALLOWED_SCENES.includes(currentScene);
-    const hasDevice = (activeDevices || 0) > 0;
-    const shouldShow = cfg.visible && allowedByScene && hasDevice;
-
-    wrap.classList.toggle('show', shouldShow);
-    wrap.classList.remove('left', 'right');
-    wrap.classList.add(cfg.side);
-
-    if (shouldShow) {
-      initGpsMap();
-      if (gpsMap) setTimeout(() => gpsMap.resize(), 50);
-    }
-  }
-
-  async function applyState(state) {
-    // Logo
-    placeInStack('logo-wrap', state.logo.side);
-    document.getElementById('logo-wrap').classList.toggle('show', state.logo.visible);
-
-    // Clima / data / hora
-    placeInStack('irl-widget', state.weather.side);
-    document.getElementById('irl-widget').classList.toggle('show', state.weather.visible);
-    if (state.weather.visible) await renderWeatherWidget(state.weather);
-
-    // QR code
-    applyQrState(state.qrcode);
-
-    // Contador de plataforma
-    placeInStack('viewer-badge', state.viewerCounter.side);
-    renderViewerBadge(state.viewerCounter, state.live);
-
-    // GPS (agora depende tambem da cena atual do OBS e de ter celular ativo)
-    applyGpsState(state.gps, state.currentScene, state.gpsActiveDevices);
-  }
-
-  let currentState = null;
-
-  async function poll() {
-    try {
-      const resp = await fetch('/api/state', { cache: 'no-store' });
-      currentState = await resp.json();
-      await applyState(currentState);
-    } catch (e) {
-      console.error('erro buscando estado', e);
-    }
-  }
-
-  // relogio/data atualizam a cada segundo, sem esperar o poll do servidor
+  // Atualiza o clima a cada 10 minutos.
   setInterval(() => {
-    if (currentState && currentState.weather.visible) renderWeatherWidget(currentState.weather);
-  }, 1000);
-
-  poll();
-  setInterval(poll, 3000);
+    const city = localStorage.getItem('overlayCity');
+    if (city) loadCity(city);
+  }, 10 * 60 * 1000);
+})();
 </script>
 </body>
 </html>
-OVERLAYEOF
